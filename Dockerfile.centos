@@ -1,0 +1,18 @@
+FROM registry.centos.org/centos/centos
+
+COPY cmd/freegeoip/public /var/www
+
+ENV GOPATH=/go
+
+RUN yum -y update && \
+    yum -y install git && \
+    yum -y --enablerepo=centosplus install golang && \
+    yum clean all && \
+    mkdir -p /go/{bin,src}
+
+ADD . /go/src/github.com/fiorix/freegeoip
+RUN cd /go/src/github.com/fiorix/freegeoip/cmd/freegeoip && go get && go install
+
+ENTRYPOINT ["/go/bin/freegeoip"]
+
+EXPOSE 8080
